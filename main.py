@@ -1,46 +1,46 @@
-#https://www.pyimagesearch.com/2017/06/19/image-difference-with-opencv-and-python/
-#sudo apt install python3-pip
-#pip3 install opencv-python
-#pip3 install --upgrade scikit-image
-#pip3 install --upgrade imutils
-from skimage.metrics import structural_similarity
-import imutils
 import cv2
 import numpy as np
 import os
+import time
 
+# ideas to speed this up, perhaps c++ ? https://stackoverflow.com/questions/27035672/cv-extract-differences-between-two-images
 
-os.chdir('test')
-img1 = cv2.imread('background.JPG')
-img2 = cv2.imread('IMG_8676.JPG')
+start = time.time()
+blur_factor = 1
+unblurred = cv2.imread('background.JPG')
+kernel = np.ones((blur_factor,blur_factor),np.float32)/blur_factor*blur_factor
+bg_img = cv2.filter2D(unblurred,-1,kernel)
 
-grayA = cv2.cvtColor(img1, cv2.COLOR_BGR2GRAY)
-grayB = cv2.cvtColor(img2, cv2.COLOR_BGR2GRAY)
+rows,cols,layers = unblurred.shape
+os.chdir('test') 
+thresh = 20
 
-#(score, diff) = structural_similarity(img1, img2, full=True, multichannel=True)
-(score, diff) = structural_similarity(grayA, grayB, full=True)
-diff = (diff * 255).astype("uint8")
-print("SSIM: {}".format(score))
+outgoing_imgs = []
+outgoing_img_names = []
 
-# threshold the difference image, followed by finding contours to
-# obtain the regions of the two input images that differ
-thresh = cv2.threshold(diff, 0, 255,
-	cv2.THRESH_BINARY_INV | cv2.THRESH_OTSU)[1]
-cnts = cv2.findContours(thresh.copy(), cv2.RETR_EXTERNAL,
-	cv2.CHAIN_APPROX_SIMPLE)
-cnts = imutils.grab_contours(cnts)
+print("processing...")
+for filename in os.listdir(os.getcwd()):
+   print("file: " + filename)
+   outgoing_image = np.zeros((rows,cols,3), np.uint8)
 
-# loop over the contours
-for c in cnts:
-	# compute the bounding box of the contour and then draw the
-	# bounding box on both input images to represent where the two
-	# images differ
-	(x, y, w, h) = cv2.boundingRect(c)
-	cv2.rectangle(img1, (x, y), (x + w, y + h), (0, 0, 255), 2)
-	cv2.rectangle(img2, (x, y), (x + w, y + h), (0, 0, 255), 2)
-# show the output images
-cv2.imshow("Original", img1)
-cv2.imshow("Modified", img2)
-cv2.imshow("Diff", diff)
-cv2.imshow("Thresh", thresh)
-cv2.waitKey(0)
+   with open(os.path.join(os.getcwd(), filename), 'r') as f:
+
+      imgUnblurred = cv2.imread(filename)
+      img = cv2.filter2D(imgUnblurred,-1,kernel)
+
+      for i in range(rows):
+         for j in range(cols):
+            for k in range(layers):
+               if ( (img[i,j][k] > bg_img[i,j][k]) ): # avoid uint overflow
+                  outgoing_image[i,j][k] = img[i,j][k] - bg_img[i,j][k]
+               else:
+                  outgoing_image[i,j][k] = 0
+
+   outgoing_imgs.append(outgoing_image)
+   outgoing_img_names.append(filename)
+
+os.chdir('../output')
+for image in range(len(outgoing_imgs)):
+   filename = outgoing_img_names[image]
+   cv2.imwrite(filename, outgoing_image)
+
