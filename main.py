@@ -17,6 +17,7 @@ img2 = cv2.imread('IMG_8676.JPG')
 grayA = cv2.cvtColor(img1, cv2.COLOR_BGR2GRAY)
 grayB = cv2.cvtColor(img2, cv2.COLOR_BGR2GRAY)
 
+#(score, diff) = structural_similarity(img1, img2, full=True, multichannel=True)
 (score, diff) = structural_similarity(grayA, grayB, full=True)
 diff = (diff * 255).astype("uint8")
 print("SSIM: {}".format(score))
@@ -43,29 +44,3 @@ cv2.imshow("Modified", img2)
 cv2.imshow("Diff", diff)
 cv2.imshow("Thresh", thresh)
 cv2.waitKey(0)
-
-'''
-os.chdir('test')
-print(os.getcwd())
-
-x = np.uint8(9)
-
-
-skipFirst = True
-for filename in os.listdir(os.getcwd()):
-   with open(os.path.join(os.getcwd(), filename), 'r') as f: # open in readonly mode
-      img = cv2.imread(filename)
-
-      rows,cols,layers = img.shape
-
-      if(skipFirst):
-         skipFirst = False
-      else:
-         for i in range(rows):
-            for j in range(cols):
-               for k in range(layers):
-                  test = img[i,j,k]
-                  if(test> x ):
-                     print(test)
-                     
-'''
