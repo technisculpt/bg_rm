@@ -23,17 +23,16 @@ for filename in os.listdir(os.getcwd()):
       img= cv2.filter2D(imgUnblurred,-1,kernel)
 
       for i in range(rows):
-         if i < 100:
-            for j in range(cols):
-               bg_ch_1 = img1[i,j][0]
-               bg_ch_2 = img1[i,j][1]
-               bg_ch_3 = img1[i,j][2]
-               fg_ch_1 = img[i,j][0]
-               fg_ch_2 = img[i,j][1]
-               fg_ch_3 = img[i,j][2]
-               
-               if(((fg_ch_1 - bg_ch_1) < thresh) and ((fg_ch_2 - bg_ch_2) < thresh) and ((fg_ch_3 - bg_ch_3) < thresh) ):
-                  outgoing_image[i,j] = 255
+         for j in range(cols):
+            bg_ch_1 = img1[i,j][0]
+            bg_ch_2 = img1[i,j][1]
+            bg_ch_3 = img1[i,j][2]
+            fg_ch_1 = img[i,j][0]
+            fg_ch_2 = img[i,j][1]
+            fg_ch_3 = img[i,j][2]
+            
+            if(((fg_ch_1 - bg_ch_1) < thresh) and ((fg_ch_2 - bg_ch_2) < thresh) and ((fg_ch_3 - bg_ch_3) < thresh) ):
+               outgoing_image[i,j] = 255
 
 os.chdir('../output') 
 filename = 'out.jpg'
