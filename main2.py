@@ -1,3 +1,6 @@
+#sudo apt install python3-pip
+#pip3 install opencv-python
+
 import cv2
 import numpy as np
 import os

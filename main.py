@@ -1,5 +1,5 @@
 #https://www.pyimagesearch.com/2017/06/19/image-difference-with-opencv-and-python/
-
+#sudo apt install python3-pip
 #pip3 install opencv-python
 #pip3 install --upgrade scikit-image
 #pip3 install --upgrade imutils
